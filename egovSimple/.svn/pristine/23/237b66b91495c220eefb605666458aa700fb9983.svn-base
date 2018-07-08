@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+
+<sqlMap namespace="Camp">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="campDefaultVO" type="egovframework.let.camp.service.CampDefaultVO"/>
+
+
+	<!-- property : 자바변수명  column : db컬럼명 -->
+	
+	<resultMap id="camp" class="egovframework.let.camp.service.CampVO">
+		<result property="no" column="no"/>
+		<result property="campTypeNo" column="camp_type_no"/>
+		<result property="campName" column="camp_name"/>
+		<result property="addressRoad" column="address_road"/>
+		<result property="addressJibun" column="address_jibun"/>
+		<result property="campTel" column="camp_tel"/>
+		<result property="latitude" column="latitude"/>
+		<result property="longitude" column="longitude"/>
+		<result property="manAgencyTel" column="man_agency_tel"/>
+		<result property="manAgencyName" column="man_agency_name"/>
+		<result property="registeredId" column="registered_id" nullValue="0"/>
+		<result property="updatedId" column="updated_id" nullValue="0"/>
+		<result property="registeredAt" column="registered_at"/>
+		<result property="updatedAt" column="updated_at"/>
+	</resultMap>
+
+	<!-- 글 목록 조회 -->
+	<select id="campDAO.selectCampList" parameterClass="campDefaultVO" resultClass="egovMap">
+		
+		select 	no, camp_type_no, camp_name, address_road, address_jibun, camp_tel
+           		, latitude, longitude, man_agency_tel, man_agency_name, registered_id
+           		, registered_at, updated_id, updated_at
+        from camp where 1=1
+		
+		<isEqual prepend="AND" property="searchCondition" compareValue="0">
+			camp_type_no like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		<isEqual prepend="AND" property="searchCondition" compareValue="1">
+			camp_name like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		
+		order by no desc
+		limit #recordCountPerPage# offset #firstIndex#
+	</select>
+
+	<!-- 글 총 개수 조회 -->
+	<select id="campDAO.selectCampListTotCnt" parameterClass="campDefaultVO" resultClass="int">
+		
+		select count(*) totcnt from camp where 1=1
+		
+		<isEqual prepend="AND" property="searchCondition" compareValue="0">
+			camp_type_no like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		<isEqual prepend="AND" property="searchCondition" compareValue="1">
+			camp_name like concat('%', #searchKeyword#, '%')
+		</isEqual>
+		
+	</select>
+
+	<!-- 등록 -->
+	<insert id="campDAO.insertCamp">
+		<![CDATA[
+			INSERT INTO camp 
+				( camp_type_no
+				  , camp_name
+				  , address_road
+				  , address_jibun
+				  , camp_tel
+				  , latitude
+				  , longitude
+				  , man_agency_tel
+				  , man_agency_name
+				  , registered_id
+				  , registered_at )
+			VALUES ( #campTypeNo#
+				  , #campName#
+				  , #addressRoad#
+				  , #addressJibun#
+				  , #campTel#
+				  , #latitude#
+				  , #longitude#
+				  , #manAgencyTel#
+				  , #manAgencyName#
+				  , #registeredId#
+				  , now() )
+		]]>
+	</insert>
+	
+	<!-- 수정 -->
+	<update id="campDAO.updateCamp">
+		<![CDATA[
+			UPDATE camp
+			SET camp_type_no=#campTypeNo#
+				, name=#campName#
+				, address_road=#addressRoad#
+				, address_jibun=#addressJibun#
+				, camp_tel=#campTel#
+				, latitude=#latitude#
+				, longitude=#longitude#
+				, man_agency_tel=#manAgencyTel#
+				, man_agency_name=#manAgencyName#
+				, registered_id=#registeredId#
+				, registered_at=now()
+				, updated_id=#updatedId#
+				, updated_at=now()
+			WHERE no=#no#
+		]]>
+	</update>
+	
+	<!-- 삭제 -->
+	<delete id="campDAO.deleteCamp">
+		<![CDATA[
+			DELETE FROM camp
+			WHERE no=#no#
+		]]>
+	</delete>
+    
+	<!-- 글 조회 -->
+	<select id="campDAO.selectCamp" resultMap="camp">
+        <![CDATA[
+            select 	no, camp_type_no, camp_name, address_road, address_jibun, camp_tel
+           			, latitude, longitude, man_agency_tel, man_agency_name, registered_id
+           			, registered_at, updated_id, updated_at
+            from camp where no=#no#
+        ]]>
+    </select>
+
+</sqlMap>
